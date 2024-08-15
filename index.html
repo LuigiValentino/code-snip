@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code-snip</title>
+    
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/theme/dracula.min.css" id="theme-link">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    
+
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Fira Code', monospace;
+            background: rgb(40,42,54);
+            background: -moz-linear-gradient(160deg, rgba(40,42,54,1) 0%, rgba(71,76,106,1) 100%);
+            background: -webkit-linear-gradient(160deg, rgba(40,42,54,1) 0%, rgba(71,76,106,1) 100%);
+            background: linear-gradient(160deg, rgba(40,42,54,1) 0%, rgba(71,76,106,1) 100%);
+            filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#282a36",endColorstr="#474c6a",GradientType=1);
+            color: white;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .navbar {
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        a:hover{
+            color: rgb(216, 216, 216) !important;
+        }
+
+        .navbar h1 {
+            margin: 0;
+            font-size: 28px;
+            color: #f8f8f2;
+            text-align: left;
+            display: inline;
+        }
+
+        .navbar p {
+            margin: 0;
+            font-size: 16px;
+            color: #f8f8f2;
+            display: inline;
+        }
+
+        #container {
+            text-align: left;
+            width: 90%;
+            max-width: 1000px;
+            margin: auto;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .code-background {
+            position: relative;
+            padding: 30px;
+            margin-bottom: 20px;
+            background-color: #282a36;
+            border: 1px solid #44475a; 
+        }
+
+        .CodeMirror {
+            border-radius: 10px;
+            max-height: 600px;
+            height: 500px;
+            font-size: 18px;
+            line-height: 1.5;
+            z-index: 1;
+            color: inherit;
+        }
+
+        .toolbar {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .toolbar label {
+            margin-right: 10px;
+            font-size: 14px;
+        }
+
+        .toolbar select {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: #44475a;
+            color: white;
+            transition: background-color 0.3s, transform 0.2s;
+            font-size: 14px;
+        }
+
+        .toolbar button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: #44475a;
+            color: white;
+            transition: background-color 0.3s, transform 0.2s;
+            font-size: 14px;
+        }
+
+        .toolbar button:hover, .toolbar select:hover {
+            background-color: #6272a4;
+            transform: translateY(-2px);
+        }
+
+        .footer {
+            background-color: #44475a;
+            padding: 15px;
+            text-align: center;
+            color: #f8f8f2;
+            font-size: 14px;
+        }
+
+        @media (max-width: 600px) {
+            .toolbar {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .CodeMirror {
+                max-height: 400px;
+                height: 300px;
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="navbar">
+    <h1>Code-snip</h1>
+    <p>&nbsp;Hecho por <a href="https://luigiadducci.netlify.app" style="color: white;">Luigi Adducci</a> - <a href="https://github.com/LuigiValentino/code-snip" style="color: white;">Github </a> </p>
+</div>
+
+<div id="container">
+    <div class="toolbar">
+        <label for="theme">Theme:</label>
+        <select id="theme" onchange="changeTheme()" aria-label="Selecciona el tema">
+            <option value="dracula">Dracula</option>
+            <option value="material">Material</option>
+            <option value="monokai">Monokai</option>
+            <option value="eclipse">Eclipse</option>
+            <option value="solarized dark">Solarized Dark</option>
+            <option value="solarized light">Solarized Light</option>
+        </select>
+
+        <label for="language">Lenguaje:</label>
+        <select id="language" onchange="changeLanguage()" aria-label="Selecciona el lenguaje">
+            <option value="javascript">JavaScript</option>
+            <option value="clike">C/C++</option>
+            <option value="python">Python</option>
+            <option value="xml">XML</option>
+            <option value="htmlmixed">HTML</option>
+            <option value="css">CSS</option>
+            <option value="ruby">Ruby</option>
+            <option value="php">PHP</option>
+        </select>
+
+        <label for="gradient">Gradiente:</label>
+        <select id="gradient" onchange="applyBackground()" aria-label="Selecciona un gradiente">
+            <option value="">Ninguno</option>
+            <option value="linear-gradient(135deg, #f093fb 0%, #f5576c 100%)">Rosa a Rojo</option>
+            <option value="linear-gradient(135deg, #5ee7df 0%, #b490ca 100%)">Aqua a Lila</option>
+            <option value="linear-gradient(135deg, #c3cfe2 0%, #c3cfe2 100%)">Azul Claro</option>
+            <option value="linear-gradient(135deg, #667eea 0%, #764ba2 100%)">Púrpura</option>
+            <option value="linear-gradient(135deg, #ff758c 0%, #ff7eb3 100%)">Rosa</option>
+            <option value="linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%)">Aqua a Azul</option>
+        </select>
+
+        <button onclick="generateImage()">Descargar Imagen <i class="fas fa-download"></i></button>
+    </div>
+
+    <div id="codeBackground" class="code-background">
+        <textarea id="codeEditor">// Escribe tu código aquí
+    function saludo() {
+        console.log('Hola, mundo!');
+    }
+    saludo();
+        </textarea>
+    </div>
+
+    <canvas id="canvas" style="display:none;"></canvas>
+</div>
+
+
+<!-- CodeMirror -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/javascript/javascript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/python/python.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/xml/xml.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/htmlmixed/htmlmixed.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/css/css.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/ruby/ruby.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/php/php.min.js"></script>
+
+<!-- html2canvas -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<script>
+    let editor = CodeMirror.fromTextArea(document.getElementById('codeEditor'), {
+        lineNumbers: true,
+        mode: "javascript",
+        theme: "dracula"
+    });
+
+    function changeTheme() {
+        const theme = document.getElementById('theme').value;
+        const themeLink = document.getElementById('theme-link');
+        themeLink.href = `https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/theme/${theme}.min.css`;
+        editor.setOption("theme", theme);
+
+        // Apply background color and text color to CodeMirror based on the theme
+        const codeContainer = document.querySelector('.CodeMirror');
+        if (theme === 'dracula') {
+            codeContainer.style.backgroundColor = '#282a36';
+            codeContainer.style.color = '#f8f8f2';
+        } else if (theme === 'material') {
+            codeContainer.style.backgroundColor = '#263238';
+            codeContainer.style.color = '#ffffff';
+        } else if (theme === 'monokai') {
+            codeContainer.style.backgroundColor = '#272822';
+            codeContainer.style.color = '#f8f8f2';
+        } else if (theme === 'eclipse') {
+            codeContainer.style.backgroundColor = '#f6f6f6';
+            codeContainer.style.color = '#000000';
+        } else if (theme === 'solarized dark') {
+            codeContainer.style.backgroundColor = '#002b36';
+            codeContainer.style.color = '#839496';
+        } else if (theme === 'solarized light') {
+            codeContainer.style.backgroundColor = '#fdf6e3';
+            codeContainer.style.color = '#657b83';
+        }
+    }
+
+    function changeLanguage() {
+        const language = document.getElementById('language').value;
+        editor.setOption("mode", language);
+    }
+
+    function applyBackground() {
+        const gradient = document.getElementById('gradient').value;
+
+        const codeContainer = document.getElementById('codeBackground');
+        
+        if (gradient) {
+            codeContainer.style.backgroundImage = gradient;
+            codeContainer.style.backgroundSize = 'cover';
+        }  else {
+            codeContainer.style.backgroundImage = '';
+            codeContainer.style.backgroundColor = '#282a36'; // Default background color
+        }
+    }
+
+    function generateImage() {
+        const codeContainer = document.getElementById('codeBackground');
+
+        html2canvas(codeContainer, { useCORS: true }).then(canvas => {
+            const link = document.createElement('a');
+            link.href = canvas.toDataURL('image/png');
+            link.download = 'code-snip.png';
+            link.click();
+        });
+    }
+</script>
+
+</body>
+</html>
